@@ -87,6 +87,7 @@ public class MainWindow extends MyRadioJFrame {
      */
     private void openMusicDirAction(ActionEvent event) {
         URL url = MainWindow.class.getResource("/music");
+        System.out.println(String.valueOf(url));
         try {
             Runtime.getRuntime().exec("explorer " + String.valueOf(url));
         } catch (IOException e) {
