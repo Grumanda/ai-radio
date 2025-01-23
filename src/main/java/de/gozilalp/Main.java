@@ -7,7 +7,7 @@ import de.gozilalp.gui.MainWindow;
 public class Main {
 
     public static void main(String[] args) {
-        loadDesign(Design.FLATLIGHTLAF);
+        loadDesign(Design.FLATMATERIALDESIGNDARKIJTHEME);
         MainWindow.getInstance();
     }
 

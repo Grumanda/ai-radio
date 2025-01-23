@@ -3,7 +3,6 @@ package de.gozilalp.gui;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 
@@ -83,12 +82,12 @@ public class MainWindow extends MyRadioJFrame {
      * This method describes the actionEvent for the openMusicDirItem.
      * The method opens the directory for music in the explorer.
      *
-     * @param event
+     * @param event event
      */
     private void openMusicDirAction(ActionEvent event) {
         URL url = MainWindow.class.getResource("/music");
         try {
-            Runtime.getRuntime().exec("explorer " + String.valueOf(url));
+            Runtime.getRuntime().exec("explorer " + url);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -102,6 +101,7 @@ public class MainWindow extends MyRadioJFrame {
      */
     private void configScheduleAction(ActionEvent event) {
         //TODO
+        ScheduleDialog.getInstance(instance);
     }
 
     /**
