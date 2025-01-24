@@ -94,13 +94,12 @@ public class MainWindow extends MyRadioJFrame {
     }
 
     /**
-     * This method opens a dialog {@link TODO}.
+     * This method opens a dialog {@link ScheduleDialog}.
      * In this dialog the schedule for news can be edited.
      *
      * @param event
      */
     private void configScheduleAction(ActionEvent event) {
-        //TODO
         ScheduleDialog.getInstance(instance);
     }
 
