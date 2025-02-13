@@ -5,20 +5,23 @@ import java.util.List;
 
 public class Schedule {
 
-    private List<Boolean> schedule;
+    private int hour;
+    private boolean isActivated;
 
-    public Schedule() {
-        schedule = new ArrayList<>();
-        for (int i = 1; i <= 24; i++) {
-            schedule.add(false);
-        }
+    public Schedule(int hour, boolean isActivated) {
+        this.hour = hour;
+        this.isActivated = isActivated;
     }
 
-    public boolean getScheduleAt(int hour) {
-        return schedule.get(hour + 1);
+    public void setActivated(boolean value) {
+        isActivated = value;
     }
 
-    public void setScheduleAt(int hour, boolean isOn) {
-        schedule.set(hour + 1, isOn);
+    public boolean isActivated() {
+        return isActivated;
+    }
+
+    public int getHour() {
+        return hour;
     }
 }

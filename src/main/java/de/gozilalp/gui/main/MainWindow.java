@@ -1,4 +1,7 @@
-package de.gozilalp.gui;
+package de.gozilalp.gui.main;
+
+import de.gozilalp.gui.settings.city.ChangeCityDialog;
+import de.gozilalp.gui.settings.schedule.ScheduleDialog;
 
 import javax.swing.*;
 import java.awt.*;
@@ -23,7 +26,19 @@ public class MainWindow extends MyRadioJFrame {
         setSize(700, 700);
         setLocation(600, 200);
         setJMenuBar(getWindowMenuBar());
-        setVisible(true);
+        setLayout(new BorderLayout());
+
+        // Components
+        JPanel topPanel = new JPanel(new BorderLayout());
+        JPanel rightPadding = new JPanel();
+        rightPadding.setPreferredSize(new Dimension(10, 10));
+        DarkLightSwitchButton modeButton = new DarkLightSwitchButton("dark");
+        topPanel.add(modeButton, BorderLayout.EAST);
+        topPanel.add(rightPadding, BorderLayout.CENTER);
+
+        // Add components
+        add(new JLabel("MUSIC"), BorderLayout.CENTER);
+        add(topPanel, BorderLayout.NORTH);
     }
 
     /**
@@ -35,6 +50,7 @@ public class MainWindow extends MyRadioJFrame {
         if (instance == null) {
             instance = new MainWindow();
         }
+        instance.setVisible(true);
         return instance;
     }
 
@@ -105,13 +121,13 @@ public class MainWindow extends MyRadioJFrame {
     }
 
     /**
-     * This method opens a dialog {@link TODO}.
+     * This method opens a dialog {@link ChangeCityDialog}.
      * In this dialog the city can be edited (used for weather).
      *
      * @param event
      */
     private void configCityAction(ActionEvent event) {
-        //TODO
+        ChangeCityDialog.getInstance(instance);
     }
 
     /**
@@ -141,5 +157,16 @@ public class MainWindow extends MyRadioJFrame {
      */
     private void aboutAction(ActionEvent event) {
         //TODO
+    }
+
+    public static void tryFinalize() {
+        if (instance != null) {
+            instance.dispose();
+            try {
+                instance.finalize();
+            } catch (Throwable e) {
+                // do nothing
+            }
+        }
     }
 }

@@ -1,52 +1,37 @@
 package de.gozilalp;
 
-import java.net.URL;
+import org.slf4j.LoggerFactory;
+
+import javax.swing.*;
 import java.sql.*;
+import java.util.List;
 import java.util.logging.Logger;
 
 public class DatabaseConnector {
 
-    private Logger logger = Logger.getLogger("DatabaseConnector");
+    private static final org.slf4j.Logger log = LoggerFactory.getLogger(DatabaseConnector.class);
+    private static Logger logger = Logger.getLogger("DatabaseConnector");
 
     private static DatabaseConnector instance;
     private Connection connection;
-    private String jdbcURL = "jdbc:h2./data";
-    private String user = "my-radio";
-    private String pwd = "java.lang.NullPointerException";
+    private String jdbcURL = pathBuilder();
+    private String username = "root";
+    private String pwd = "NullPointerException";
 
     private DatabaseConnector() {
         try {
-            connection = DriverManager.getConnection(jdbcURL, user, pwd);
+            logger.info("Connecting to following database URL: " + jdbcURL);
+            Class.forName("org.hsqldb.jdbcDriver");
+            connection = DriverManager.getConnection(jdbcURL, username, pwd);
             logger.info("Connected to database!");
-
-            // Create Tables if not exists
-            Statement statement = connection.createStatement();
-            statement.execute(SQLCommands.CREATE_SCHEDULE_TABLE);
-            statement.execute(SQLCommands.CREATE_SETTINGS_TABLE);
-
-            // Test if data is already in database
-            // settings data
-            ResultSet resultSet = statement.executeQuery(SQLCommands.SELECT_SETTINGS_DATA);
-            if (!resultSet.next()) {
-                // Insert data
-                PreparedStatement prepStatement = connection.prepareStatement(
-                        SQLCommands.CREATE_SETTINGS_TABLE);
-                prepStatement.executeUpdate();
-            }
-            // schedule data
-            resultSet = statement.executeQuery(SQLCommands.SELECT_SCHEDULE_DATA);
-            if (!resultSet.next()) {
-                for (int i = 1; i <= 24; i++) {
-                    PreparedStatement prepStatement = connection.prepareStatement(
-                            SQLCommands.INSERT_SCHEDULE_DATA);
-                    prepStatement.setInt(1, i);
-                    prepStatement.setInt(2, i);
-                    prepStatement.executeUpdate();
-                }
-            }
         } catch (SQLException e) {
-            logger.severe("Failed to connect to database");
+            logger.severe("Failed to connect to database!");
             logger.severe(e.getLocalizedMessage());
+            System.exit(0);
+        } catch (ClassNotFoundException e) {
+            logger.severe("Failed to load JDBC driver!");
+            logger.severe(e.getLocalizedMessage());
+            System.exit(0);
         }
     }
 
@@ -63,5 +48,67 @@ public class DatabaseConnector {
         } catch (SQLException e) {
             logger.severe(e.getLocalizedMessage());
         }
+    }
+
+    public void setupSchedule() {
+        try {
+            Statement statement = connection.createStatement();
+            String sql = "SELECT * FROM SCHEDULE";
+            ResultSet set = statement.executeQuery(sql);
+            while (set.next()) {
+                int hour = set.getInt(1);
+                boolean isActivated = set.getBoolean(2);
+                Schedule schedule = new Schedule(hour, isActivated);
+                Main.scheduleList.add(schedule);
+            }
+            statement.close();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void saveNewSchedule(List<Schedule> scheduleList) {
+        try {
+            for (Schedule schedule : scheduleList) {
+                Statement statement = connection.createStatement();
+                String sql = "UPDATE SCHEDULE SET isActivated = " + schedule.isActivated()
+                        + " WHERE schedulehour = " + schedule.getHour();
+                statement.execute(sql);
+                statement.close();
+            }
+        } catch (SQLException e) {
+            logger.severe(e.getLocalizedMessage());
+        }
+    }
+
+    public void saveCity(String city) {
+        try {
+            String sql = "UPDATE settings SET city = ?";
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setString(1, city);
+            statement.execute();
+            statement.close();
+        } catch (SQLException e) {
+            logger.severe(e.getLocalizedMessage());
+        }
+    }
+
+    public void changeDesign(String design) {
+        String sql = "UPDATE settings SET ";
+    }
+
+    private static String pathBuilder() {
+        String jdbcUrl = "jdbc:hsqldb:file:";
+        String url = String.valueOf(DatabaseConnector.class.getResource("/database"));
+        String rightURL = "";
+        for (int i = 6; i < url.length(); i++) {
+            if (url.charAt(i) == '/') {
+                rightURL = rightURL + "\\";
+            } else {
+                rightURL = rightURL + url.charAt(i);
+            }
+        }
+        jdbcUrl = jdbcUrl + rightURL + "\\database" + "; shutdown=true";
+        return jdbcUrl;
     }
 }

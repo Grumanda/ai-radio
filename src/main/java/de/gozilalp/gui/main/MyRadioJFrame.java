@@ -1,4 +1,4 @@
-package de.gozilalp.gui;
+package de.gozilalp.gui.main;
 
 import javax.swing.*;
 
@@ -14,7 +14,7 @@ public class MyRadioJFrame extends JFrame {
      * Icon for the program.
      */
     private final static ImageIcon ICON = new ImageIcon(
-            MyRadioJFrame.class.getResource("/my_radio.png"));
+            MyRadioJFrame.class.getResource("/assets/my_radio.png"));
 
     /**
      * Constructor of the class.

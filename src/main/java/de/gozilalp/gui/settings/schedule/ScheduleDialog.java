@@ -1,4 +1,8 @@
-package de.gozilalp.gui;
+package de.gozilalp.gui.settings.schedule;
+
+import de.gozilalp.DatabaseConnector;
+import de.gozilalp.Main;
+import de.gozilalp.Schedule;
 
 import javax.swing.*;
 import java.awt.*;
@@ -13,6 +17,7 @@ public class ScheduleDialog extends JDialog {
     private JButton saveButton;
 
     private ScheduleDialog(JFrame mainInstance) {
+        setTitle("Schedule");
         setSize(400, 400);
         setLocationRelativeTo(mainInstance);
         setLayout(new BorderLayout());
@@ -30,13 +35,13 @@ public class ScheduleDialog extends JDialog {
 
         add(scrollPane, BorderLayout.CENTER);
         add(buttonPanel, BorderLayout.SOUTH);
-        setVisible(true);
     }
 
     public static ScheduleDialog getInstance(JFrame mainInstance) {
         if (instance == null) {
             instance = new ScheduleDialog(mainInstance);
         }
+        instance.setVisible(true);
         return instance;
     }
 
@@ -46,6 +51,9 @@ public class ScheduleDialog extends JDialog {
             for (int i = 1; i <= 24; i++) {
                 JCheckBox checkBox = new JCheckBox(i + ":00");
                 checkBox.setFont(new Font("Tahoma", Font.PLAIN, 20));
+                if (Main.scheduleList.get(i - 1).isActivated()) {
+                    checkBox.setSelected(true);
+                }
                 checkBoxList.add(checkBox);
             }
         }
@@ -74,8 +82,31 @@ public class ScheduleDialog extends JDialog {
     }
 
     private void saveButtonAction(ActionEvent event) {
-        getSelectedSchedule().forEach(schedule -> System.out.println(schedule));
-        //TODO datenbank access
+        // update list
+        List<Schedule> scheduleList = Main.scheduleList;
+        for (Schedule schedule : scheduleList) {
+            String scheduleHour = String.valueOf(schedule.getHour());
+            if (getSelectedSchedule().contains(scheduleHour)) {
+                schedule.setActivated(true);
+            } else {
+                schedule.setActivated(false);
+            }
+        }
+
+        // update schedule in database and restart
+        DatabaseConnector.getInstance().saveNewSchedule(Main.scheduleList);
         instance.dispose();
+        //TODO neustarten
+    }
+
+    public static void tryFinalize() {
+        if (instance != null) {
+            instance.dispose();
+            try {
+                instance.finalize();
+            } catch (Throwable e) {
+                // do nothing
+            }
+        }
     }
 }
